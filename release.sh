@@ -29,10 +29,14 @@ mkdir -p $PROJECT_PATH/$RELEASE_DIR
 echo ""
 echo -e "${COL_BLUE}Creating release $ACE_NAME-$VERSION...${COL_RESET}"
 echo ""
+pushd $PROJECT_PATH/python27 > /dev/null
+zip -rq $PROJECT_PATH/src/acestream.engine/python/lib/python27.zip *
+popd > /dev/null
 pushd $PROJECT_PATH/src > /dev/null
 tar -cvjf $ACE_NAME-$VERSION.tar.bz2 *
 popd > /dev/null
-mv -f $PROJECT_PATH/src/$ACE_NAME-$VERSION.tar.bz2 $PROJECT_PATH/$RELEASE_DIR    
+mv -f $PROJECT_PATH/src/$ACE_NAME-$VERSION.tar.bz2 $PROJECT_PATH/$RELEASE_DIR
+rm -f $PROJECT_PATH/src/acestream.engine/python/lib/python27.zip
 echo ""
 echo -e "${COL_YELLOW}Done:${COL_MAGENTA} $ACE_NAME-$VERSION.tar.bz2${COL_RESET}"
 echo ""
