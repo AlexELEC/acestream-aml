@@ -68,6 +68,8 @@ function add_external_playlist()
     var category = $("#add-external-playlist-category").val(),
         name = $("#add-external-playlist-name").val().trim(),
         url = $("#add-external-playlist-url").val().trim(),
+        login = $("#add-external-playlist-http-login").val().trim(),
+        password = $("#add-external-playlist-http-password").val().trim(),
         update_interval = $("#add-external-playlist-update-interval").val(),
         mode = $("#playlist-upload-form").data("mode"),
         playlist_id = $("#playlist-upload-form").data("playlist-id");
@@ -89,7 +91,9 @@ function add_external_playlist()
         type: "content",
         category: category,
         name: name,
-        update_interval: update_interval
+        update_interval: update_interval,
+        login: login,
+        password: password,
     };
 
     if(mode == "edit") {
@@ -108,6 +112,8 @@ function add_external_playlist()
         function(response) {
             $("#add-external-playlist-name").val("");
             $("#add-external-playlist-url").val("");
+            $("#add-external-playlist-http-login").val("");
+            $("#add-external-playlist-http-password").val("");
             reload_external_playlists();
             if(mode == "add") {
                 show_page("proxy-server-playlist");
@@ -134,6 +140,8 @@ function edit_external_playlist(playlist_id)
         function(response) {
             $("#add-external-playlist-name").val(response.name);
             $("#add-external-playlist-url").val(response.url);
+            $("#add-external-playlist-http-login").val(response.login);
+            $("#add-external-playlist-http-password").val(response.password);
             $("#add-external-playlist-category option[value='"+response.category+"']").prop('selected', true);
             $("#add-external-playlist-update-interval option[value='"+response.interval+"']").prop('selected', true);
 
@@ -901,7 +909,7 @@ function reload_playlist_url(ip_list)
         allow_intranet_access = !!$("#allow_intranet_access").is(":checked"),
     //--START MOD by !Joy! for Dorik--//
         currentSubCategory = $("#filter-subcategory").val();
-        
+
     if (currentSubCategory === "_all_") {
         currentSubCategory = "";
     } else if ( currentSubCategory === "_favorite_") {
@@ -1385,7 +1393,15 @@ function update_visible_playlist_items()
                     if(response.playlist) {
                         for(var i=0; i<response.playlist.length; i++) {
                             var item = response.playlist[i];
-                            $("#playlist-item-row-" + item.id).html(render_playlist_item_row(item));
+                            //--START MOD by !Joy! for Dorik--//
+                            var row = $("#playlist-item-row-" + item.id),
+                                checked = row.find('.playlist-check-item').prop('checked') ? true : false;
+                            row.html(render_playlist_item_row(item));
+                            if (checked) {
+                                row.find('.playlist-check-item').prop('checked',true);
+                            }
+                            //$("#playlist-item-row-" + item.id).html(render_playlist_item_row(item));
+                            //--END MOD by !Joy! for Dorik--//
                         }
                     }
                 }
