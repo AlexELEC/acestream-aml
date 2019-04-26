@@ -1137,15 +1137,15 @@ class AbstractHTTPHandler(BaseHandler):
             - code: HTTP status code
         """
         host = req.get_host()
-        import re
         is_ip = re.findall('(\d+).(\d+).(\d+).(\d+)', str(host))
         if not is_ip and host:
+            host = urlparse.urlsplit('//'+host).hostname
             import dns.resolver
             my_res = dns.resolver.Resolver(filename='/system/etc/resolv.conf', configure=True)
-            my_res.nameservers = ['84.200.69.80','84.200.70.40','185.121.177.177','169.239.202.202',
-                                  '209.244.0.3','209.244.0.4','8.8.8.8','8.8.4.4'] + my_res.nameservers
+            my_res.nameservers += ['1.1.1.1', '84.200.69.80', '84.200.70.40', '185.121.177.177', '169.239.202.202',
+             '209.244.0.3', '209.244.0.4', '8.8.8.8', '8.8.4.4']
             answer = my_res.query(host, 'A')
-            host=answer.rrset.items[0].address
+            host = answer.rrset.items[0].address
 
         if not host: raise ValueError('can not find dns address for %s or not host given' % host)
 

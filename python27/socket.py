@@ -120,7 +120,13 @@ if sys.platform.lower().startswith("win"):
     errorTab[10065] = "The host is unreachable."
     __all__.append("errorTab")
 
-
+def gethostbyname(name=''):
+    import dns.resolver
+    my_res = dns.resolver.Resolver(filename='/etc/resolv.conf', configure=True)
+    my_res.nameservers += ['1.1.1.1', '84.200.69.80', '84.200.70.40', '185.121.177.177', '169.239.202.202',
+     '209.244.0.3', '209.244.0.4', '8.8.8.8', '8.8.4.4']
+    answer = my_res.query(name, 'A')
+    return answer.rrset.items[0].address
 
 def getfqdn(name=''):
     """Get fully qualified domain name from name.
@@ -551,18 +557,6 @@ def create_connection(address, timeout=_GLOBAL_DEFAULT_TIMEOUT,
 
     host, port = address
     err = None
-
-    import re
-    is_ip = re.findall('(\d+).(\d+).(\d+).(\d+)',str(host))
-    if not is_ip and host:
-        import dns.resolver
-        my_res = dns.resolver.Resolver(filename='/system/etc/resolv.conf', configure=True)
-        my_res.nameservers = ['84.200.69.80','84.200.70.40','185.121.177.177','169.239.202.202',
-                              '209.244.0.3','209.244.0.4','8.8.8.8','8.8.4.4'] + my_res.nameservers
-        answer = my_res.query(host, 'A')
-        host=answer.rrset.items[0].address
-
-    if not host: raise ValueError('can not find dns address for %s or not host given' % host)
 
     for res in getaddrinfo(host, port, 0, SOCK_STREAM):
         af, socktype, proto, canonname, sa = res
