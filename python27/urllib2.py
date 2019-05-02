@@ -108,6 +108,7 @@ try:
 except ImportError:
     from StringIO import StringIO
 
+import dns.resolver
 from urllib import (unwrap, unquote, splittype, splithost, quote,
      addinfourl, splitport, splittag,
      splitattr, ftpwrapper, splituser, splitpasswd, splitvalue)
@@ -1137,15 +1138,28 @@ class AbstractHTTPHandler(BaseHandler):
             - code: HTTP status code
         """
         host = req.get_host()
-        is_ip = re.findall('(\d+).(\d+).(\d+).(\d+)', str(host))
-        if not is_ip and host:
-            host = urlparse.urlsplit('//'+host).hostname
-            import dns.resolver
-            my_res = dns.resolver.Resolver(filename='/system/etc/resolv.conf', configure=True)
-            my_res.nameservers += ['1.1.1.1', '84.200.69.80', '84.200.70.40', '185.121.177.177', '169.239.202.202',
-             '209.244.0.3', '209.244.0.4', '8.8.8.8', '8.8.4.4']
-            answer = my_res.query(host, 'A')
-            host = answer.rrset.items[0].address
+        if not re.search('\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b', str(host).strip()) and host:
+            host = urlparse.urlsplit('//' + host).hostname
+            resolver = dns.resolver.Resolver(filename='/system/etc/resolv.conf', configure=True)
+            resolver.nameservers += ['1.1.1.1',
+             '1.0.0.1',
+             '9.9.9.9',
+             '149.112.112.112',
+             '84.200.69.80',
+             '84.200.70.40',
+             '185.121.177.177',
+             '169.239.202.202',
+             '4.2.2.1',
+             '4.2.2.2',
+             '8.26.56.26',
+             '8.20.247.20',
+             '8.8.8.8',
+             '8.8.4.4']
+            resolver.lifetime = 20.0
+            try:
+                host = resolver.query(host)[0].address
+            except:
+                host = None
 
         if not host: raise ValueError('can not find dns address for %s or not host given' % host)
 

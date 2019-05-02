@@ -79,7 +79,7 @@ else:
          SSL_ERROR_EOF, \
          SSL_ERROR_INVALID_ERROR_CODE
 
-import os, sys, warnings
+import os, sys, warnings, urlparse, re
 
 try:
     from cStringIO import StringIO
@@ -120,13 +120,34 @@ if sys.platform.lower().startswith("win"):
     errorTab[10065] = "The host is unreachable."
     __all__.append("errorTab")
 
-def gethostbyname(name=''):
-    import dns.resolver
-    my_res = dns.resolver.Resolver(filename='/system/etc/resolv.conf', configure=True)
-    my_res.nameservers += ['1.1.1.1', '84.200.69.80', '84.200.70.40', '185.121.177.177', '169.239.202.202',
-     '209.244.0.3', '209.244.0.4', '8.8.8.8', '8.8.4.4']
-    answer = my_res.query(name, 'A')
-    return answer.rrset.items[0].address
+def gethostbyname(name = ''):
+    if not re.search('\\b(?:[0-9]{1,3}\\.){3}[0-9]{1,3}\\b', str(name)) and name:
+        name = urlparse.urlsplit('//' + name).hostname
+        import dns.resolver
+        resolver = dns.resolver.Resolver(filename='/system/etc/resolv.conf', configure=True)
+        resolver.nameservers += ['1.1.1.1',
+         '1.0.0.1',
+         '9.9.9.9',
+         '149.112.112.112',
+         '84.200.69.80',
+         '84.200.70.40',
+         '185.121.177.177',
+         '169.239.202.202',
+         '4.2.2.1',
+         '4.2.2.2',
+         '8.26.56.26',
+         '8.20.247.20',
+         '8.8.8.8',
+         '8.8.4.4']
+        resolver.lifetime = 20.0
+        try:
+            name = resolver.query(name)[0].address
+        except:
+            pass
+
+    if not name:
+        raise error('can not find dns address for %s or not host given' % name)
+    return name
 
 def getfqdn(name=''):
     """Get fully qualified domain name from name.
