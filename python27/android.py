@@ -12,7 +12,9 @@
 # License for the specific language governing permissions and limitations under
 # the License.
 
-import os, subprocess
+import os
+import subprocess
+import hashlib
 
 # Disk info
 df = subprocess.Popen(["df", "/"], stdout=subprocess.PIPE)
@@ -49,6 +51,18 @@ class Android(object):
     return "Amlogic"
 
   @staticmethod
+  def getDeviceManufacturer():
+    return "Amlogic"
+
+  @staticmethod
+  def getAppId():
+    return hashlib.sha1("acestream")
+
+  @staticmethod
+  def getAppVersionCode():
+    return "3014400"
+
+  @staticmethod
   def getDisplayLanguage():
     return "ru_RU"
 
@@ -70,7 +84,11 @@ class Android(object):
 
   @staticmethod
   def getDeviceId():
-    return "AMLBOX"
+    return hashlib.sha1("AMLBOX")
+
+  @staticmethod
+  def onSettingsUpdated():
+    return None
 
   @staticmethod
   def getBlockSize(self):
