@@ -17,7 +17,7 @@ import subprocess
 import hashlib
 
 # Disk info
-df = subprocess.Popen(["df", "/"], stdout=subprocess.PIPE)
+df = subprocess.Popen(["df"], stdout=subprocess.PIPE)
 output = df.communicate()[0]
 disk_device, disk_size, disk_used, disk_available, disk_percent, disk_mountpoint = output.split("\n")[1].split()
 # Memory info
